@@ -1,9 +1,13 @@
+#Import Required Modules
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
+#Define base class
 Base = declarative_base()
 
+
+#Define company model
 class Company(Base):
     __tablename__ = 'companies'
 
@@ -13,6 +17,7 @@ class Company(Base):
 
     freebies = relationship('Freebie', backref='company')
 
+    #Company methods
     def give_freebie(self, dev, item_name, value):
         """Give a freebie to a developer."""
         return Freebie(item_name=item_name, value=value, dev=dev, company=self)
@@ -22,7 +27,7 @@ class Company(Base):
         """Find the oldest company."""
         return session.query(cls).order_by(cls.founding_year).first()
 
-
+#Define Dev model
 class Dev(Base):
     __tablename__ = 'devs'
 
@@ -30,7 +35,7 @@ class Dev(Base):
     name = Column(String, nullable=False)
 
     freebies = relationship('Freebie', backref='dev')
-
+#Dev methods
     def received_one(self, item_name):
         """Check if a dev received a specific freebie."""
         return any(freebie.item_name == item_name for freebie in self.freebies)
@@ -40,7 +45,7 @@ class Dev(Base):
         if freebie in self.freebies:
             freebie.dev = dev
 
-
+#Define Freebie
 class Freebie(Base):
     __tablename__ = 'freebies'
 
