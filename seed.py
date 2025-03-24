@@ -20,12 +20,16 @@ apple = Company(name="Apple", founding_year=1976)
 alice = Dev(name="Alice")
 bob = Dev(name="Bob")
 
+# Commit companies and devs first to assign IDs
+session.add_all([google, apple, alice, bob])
+session.commit()
+
 # Create Freebies
 freebie1 = Freebie(item_name="Sticker", value=5, dev=alice, company=google)
 freebie2 = Freebie(item_name="Mug", value=10, dev=bob, company=apple)
 
-# Add to session and commit
-session.add_all([google, apple, alice, bob, freebie1, freebie2])
+# Add Freebies
+session.add_all([freebie1, freebie2])
 session.commit()
 
 print("Database seeded successfully!")

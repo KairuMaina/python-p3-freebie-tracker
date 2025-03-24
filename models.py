@@ -1,13 +1,12 @@
-#Import Required Modules
+# Import Required Modules
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-#Define base class
+# Define base class
 Base = declarative_base()
 
-
-#Define company model
+# Define company model
 class Company(Base):
     __tablename__ = 'companies'
 
@@ -15,27 +14,29 @@ class Company(Base):
     name = Column(String, nullable=False)
     founding_year = Column(Integer, nullable=False)
 
-    freebies = relationship('Freebie', backref='company')
+    freebies = relationship('Freebie', backref='company', overlaps="company,freebies")
 
-    #Company methods
+    # Company methods
     def give_freebie(self, dev, item_name, value):
         """Give a freebie to a developer."""
-        return Freebie(item_name=item_name, value=value, dev=dev, company=self)
+        freebie = Freebie(item_name=item_name, value=value, dev=dev, company=self)
+        return freebie
 
     @classmethod
     def oldest_company(cls, session):
         """Find the oldest company."""
         return session.query(cls).order_by(cls.founding_year).first()
 
-#Define Dev model
+# Define Dev model
 class Dev(Base):
     __tablename__ = 'devs'
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
 
-    freebies = relationship('Freebie', backref='dev')
-#Dev methods
+    freebies = relationship('Freebie', backref='dev', overlaps="dev,freebies")
+
+    # Dev methods
     def received_one(self, item_name):
         """Check if a dev received a specific freebie."""
         return any(freebie.item_name == item_name for freebie in self.freebies)
@@ -45,7 +46,7 @@ class Dev(Base):
         if freebie in self.freebies:
             freebie.dev = dev
 
-#Define Freebie
+# Define Freebie model
 class Freebie(Base):
     __tablename__ = 'freebies'
 
